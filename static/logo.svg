@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" width="160" height="48" aria-hidden="true">
+  <rect width="160" height="48" rx="8" fill="#7FFF00"/>
+  <path
+    d="M18 34 L28 16 L38 32 L48 14 L58 34 L68 18 L78 34"
+    fill="none"
+    stroke="#0d3d2c"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <text x="88" y="31" font-family="Times New Roman,Times,serif" font-size="15" fill="#0d3d2c">Obuv</text>
+</svg>

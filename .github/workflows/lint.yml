@@ -1,4 +1,4 @@
-name: Lint with Ruff
+name: Lint
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  ruff-lint:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -15,15 +15,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: '3.13'
 
-      - name: Install Ruff and Just
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: 'latest'
+
+      - name: Install Just
         run: |
-          pip install ruff
-          curl -LSfs https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+          curl -LSfs https://just.systems/install.sh | bash -s -- --to "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Run lint via Just
-        run: just lint
+      - name: Install dependencies (incl. dev)
+        run: uv sync --group dev
 
-      - name: Run def-form
-        run: just def-form-check
+      - name: Run linters
+        run: uv run just lint

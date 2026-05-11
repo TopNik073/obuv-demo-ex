@@ -13,7 +13,7 @@ Python 3.13, FastAPI, SQLAlchemy 2 (async), Pydantic, Alembic, asyncpg, JWT, pyw
 
 ## Быстрый старт
 
-1. Установить зависимости: `uv sync` (из корня репозитория).
+1. Установить зависимости: `uv sync --group dev` (из корня репозитория; в группе `dev` — ruff и def-form для линтеров).
 2. Создать `.env` в корне (рядом с `pyproject.toml`) с переменными подключения к БД и секретами, например: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`, `JWT_SECRET`, при необходимости `ADMIN_BOOTSTRAP_PASSWORD` для первого администратора.
 3. Применить миграции: `uv run alembic upgrade head`.
 4. Запуск API из каталога `src`: `cd src && uv run uvicorn main_app:app --host 127.0.0.1 --port 8000` (порт можно переопределить в `.env`).

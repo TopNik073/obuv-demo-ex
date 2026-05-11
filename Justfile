@@ -9,19 +9,19 @@ default:
 set dotenv-filename := ".env"
 
 # Run all checks: linters and formatting validation
-lint: ruff-check
+lint: ruff-check def-form-check
 
 # --- Dependency Management ---
 
 # Update project dependencies
 [group('dependencies')]
 update:
-    uv sync --upgrade
+    uv sync --upgrade --group dev
 
 # Sync project dependencies
 [group('dependencies')]
 sync:
-    uv sync
+    uv sync --group dev
 
 # --- Linters and Formatting ---
 

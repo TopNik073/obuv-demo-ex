@@ -1,7 +1,11 @@
-from collections.abc import Collection, Sequence
+from collections.abc import Collection
+from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import asc, desc, or_, select
+from sqlalchemy import asc
+from sqlalchemy import desc
+from sqlalchemy import or_
+from sqlalchemy import select
 
 from repository.base.postgres import BasePostgresRepository
 from repository.user.models.postgres import UserORM

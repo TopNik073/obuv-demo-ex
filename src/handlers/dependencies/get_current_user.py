@@ -1,7 +1,9 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 from starlette import status
 
 from repository.user.models.pydantic import UserModel

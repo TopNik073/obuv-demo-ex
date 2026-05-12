@@ -1,12 +1,19 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import Query
+from fastapi import Response
+from fastapi import status
 
 from handlers.dependencies.require_roles import require_roles
 from repository.user.models.pydantic import UserModel
 from repository.user.models.roles import UserRole
-from services.user.models import UserAdminCreate, UserAdminRead, UserAdminUpdate
+from services.user.models import UserAdminCreate
+from services.user.models import UserAdminRead
+from services.user.models import UserAdminUpdate
 from services.user.service import UserService
 
 user_router = APIRouter(prefix='/users', tags=['users'])

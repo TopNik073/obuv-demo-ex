@@ -1,10 +1,16 @@
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, Integer, Numeric, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import Numeric
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
-from repository.base.models.postgres import BaseORM, TimestampMixin
+from repository.base.models.postgres import BaseORM
+from repository.base.models.postgres import TimestampMixin
 from repository.order.models.status import OrderStatus
 
 

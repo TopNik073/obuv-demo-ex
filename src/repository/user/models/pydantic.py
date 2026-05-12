@@ -1,4 +1,5 @@
-from repository.base import BaseModelIdentifiable, TimestampedModelMixin
+from repository.base import BaseModelIdentifiable
+from repository.base import TimestampedModelMixin
 from repository.user.models.roles import UserRole
 
 

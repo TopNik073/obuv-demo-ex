@@ -1,9 +1,11 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
+from pydantic import ConfigDict
 
-from repository.base.models import BaseModelIdentifiable, TimestampedModelMixin
+from repository.base.models import BaseModelIdentifiable
+from repository.base.models import TimestampedModelMixin
 from repository.order.models.status import OrderStatus
 
 

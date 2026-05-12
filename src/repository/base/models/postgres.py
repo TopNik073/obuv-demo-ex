@@ -1,13 +1,13 @@
 import uuid
-from datetime import datetime, UTC
+
+from datetime import UTC
+from datetime import datetime
 
 from sqlalchemy import DateTime
-
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 
 class BaseORM(DeclarativeBase):

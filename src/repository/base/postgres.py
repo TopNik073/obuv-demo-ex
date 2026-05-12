@@ -1,15 +1,17 @@
-from typing import TypeVar, Annotated
 from collections.abc import Sequence
+from typing import Annotated
+from typing import TypeVar
 from uuid import UUID
 
 from fastapi import Depends
-from sqlalchemy import select, delete
+from sqlalchemy import delete
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from repository.base import BaseModelTranslator
-from repository.base.repository import BaseRepository
 from repository.base.models.postgres import BaseORM
 from repository.base.models.pydantic import BaseModelIdentifiable
+from repository.base.repository import BaseRepository
 from utils.db_connection import get_db_session
 
 ORMType = TypeVar('ORMType', bound=BaseORM)

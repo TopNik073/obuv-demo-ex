@@ -1,4 +1,5 @@
-from repository.order.models import OrderItemORM, OrderORM
+from repository.order.models import OrderItemORM
+from repository.order.models import OrderORM
 from repository.order.repository import OrderRepository
 from repository.order.translator import OrderModelTranslator
 

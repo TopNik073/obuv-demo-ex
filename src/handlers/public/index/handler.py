@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent

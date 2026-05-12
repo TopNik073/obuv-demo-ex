@@ -1,4 +1,5 @@
 import socket
+import sys
 import threading
 import time
 
@@ -8,14 +9,28 @@ import uvicorn
 import webview
 
 from core.config import config as app_config
+from core.paths import bundle_root
 from main_app import app
+from utils.db_migrate import run_migrations
 
 APP_HOST = app_config.APP_HOST
 APP_PORT = app_config.APP_PORT
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _WEBVIEW_STORAGE = Path.home() / '.obuv-demo-ex' / 'webview'
-_APP_ICON = _PROJECT_ROOT / 'static' / 'icon.png'
+
+
+def _webview_icon_path() -> str | None:
+    static_dir = bundle_root() / 'static'
+    for name in ('logo.ico', 'icon.ico'):
+        path = static_dir / name
+        if path.is_file():
+            return str(path)
+    png = static_dir / 'icon.png'
+    if sys.platform == 'win32':
+        return None
+    if png.is_file():
+        return str(png)
+    return None
 
 
 def _wait_for_tcp(
@@ -35,6 +50,7 @@ def _wait_for_tcp(
 
 
 def main() -> None:
+    run_migrations()
     uvicorn_cfg = uvicorn.Config(
         app,
         host=APP_HOST,
@@ -58,7 +74,7 @@ def main() -> None:
 
     window.events.closed += on_closed
     _WEBVIEW_STORAGE.mkdir(parents=True, exist_ok=True)
-    icon_arg = str(_APP_ICON) if _APP_ICON.is_file() else None
+    icon_arg = _webview_icon_path()
     webview.start(
         private_mode=False,
         storage_path=str(_WEBVIEW_STORAGE),

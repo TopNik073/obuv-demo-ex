@@ -2,7 +2,6 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import UTC
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter
@@ -12,12 +11,11 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.config import config
 from core.logger import get_logger
+from core.paths import bundle_root
 from utils.db_connection import engine
 from utils.seed_admin import seed_admin
 
 logger = get_logger('app_factory')
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 class AppFactory:
@@ -75,7 +73,7 @@ class AppFactory:
         logger.info('Application shutdown complete')
 
     def setup_app(self):
-        static_dir = PROJECT_ROOT / 'static'
+        static_dir = bundle_root() / 'static'
         if static_dir.is_dir():
             self._app.mount('/static', StaticFiles(directory=str(static_dir)), name='static')
 

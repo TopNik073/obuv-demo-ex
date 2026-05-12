@@ -1,0 +1,36 @@
+name: Desktop executable
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: 'latest'
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Build Windows executable
+        run: uv run pyinstaller desktop.spec
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: obuv-demo-ex-windows
+          path: dist/obuv-demo-ex.exe

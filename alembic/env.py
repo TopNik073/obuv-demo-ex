@@ -13,31 +13,42 @@ PROJECT_PATH: Path = Path(__file__).parent.parent
 # Leading digits in custom revision ids (e.g. 0000_..., 0001_slug_...)
 _REV_SEQ_DIGITS: int = 4
 
-sys.path = [
-    PROJECT_PATH.__str__() + '/src',
-    *sys.path,
-]
+_bundle_src = PROJECT_PATH / 'src'
+_path_insert: list[str] = []
+if _bundle_src.is_dir():
+    _path_insert.append(str(_bundle_src))
+_path_insert.append(str(PROJECT_PATH))
+sys.path = [*_path_insert, *sys.path]
+
+
+def _env_file_dir() -> Path:
+    if getattr(sys, 'frozen', False):
+        return Path(sys.executable).resolve().parent
+    return PROJECT_PATH
 
 
 if os.getenv('POSTGRESQL_CONNECTION_STRING') is None:
-    with open(PROJECT_PATH / '.env', 'r') as env_file:
-        for line in env_file:
-            split_line: list[str] = line[:-1].split('=', maxsplit=1)
-            if len(split_line) == 2:
-                variable_name, variable_value = split_line
-                os.environ[variable_name] = variable_value
+    _env_path = _env_file_dir() / '.env'
+    if _env_path.is_file():
+        with _env_path.open(encoding='utf-8') as env_file:
+            for line in env_file:
+                split_line: list[str] = line[:-1].split('=', maxsplit=1)
+                if len(split_line) == 2:
+                    variable_name, variable_value = split_line
+                    os.environ[variable_name] = variable_value
 
 
 
-from core.config import config as app_config
 from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from alembic import context
-from repository.base.models import BaseORM
 import repository  # noqa: F401 — register ORM tables on metadata
+
+from alembic import context
+from core.config import config as app_config
+from repository.base.models import BaseORM
 
 config = context.config
 fileConfig(config.config_file_name)

@@ -4,9 +4,14 @@ from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
+from core.paths import config_root
+
 
 class Config(BaseSettings):
-    model_config = SettingsConfigDict(env_file='../.env', env_file_encoding='utf-8')
+    model_config = SettingsConfigDict(
+        env_file=str(config_root() / '.env'),
+        env_file_encoding='utf-8',
+    )
 
     SENSITIVE_DATA: list[str] = [
         'username',

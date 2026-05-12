@@ -25,6 +25,7 @@ dependencies = [
 dev = [
     "ruff>=0.15.0",
     "def-form>=0.2.0",
+    "pyinstaller>=6.20.0",
 ]
 
 [tool.def-form]
@@ -40,7 +41,6 @@ target-version = "py313"
 line-length = 120
 exclude = [
     ".venv/",
-    "tests/cases/",
 ]
 lint.flake8-tidy-imports.ban-relative-imports = "all"
 lint.mccabe.max-complexity = 20
@@ -104,6 +104,9 @@ lint.select = [
     # "LOG", # flake8-logging
     "RUF", # Ruff-specific rules
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/env.py" = ["INP001", "I001", "PLR2004"]
 
 [tool.ruff.format]
 quote-style = "single"

@@ -1,11 +1,10 @@
-from pathlib import Path
-
 from fastapi import APIRouter
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
-templates = Jinja2Templates(directory=str(PROJECT_ROOT / 'templates'))
+from core.paths import bundle_root
+
+templates = Jinja2Templates(directory=str(bundle_root() / 'templates'))
 
 public_index_router = APIRouter()
 

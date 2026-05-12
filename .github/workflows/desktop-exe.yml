@@ -2,8 +2,11 @@ name: Desktop executable
 
 on:
   push:
-    branches:
-      - '**'
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
 
 jobs:
   build-exe:
@@ -29,8 +32,8 @@ jobs:
       - name: Build Windows executable
         run: uv run pyinstaller desktop.spec
 
-      - name: Upload executable
-        uses: actions/upload-artifact@v4
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
         with:
-          name: obuv-demo-ex-windows
-          path: dist/obuv-demo-ex.exe
+          files: dist/obuv-demo-ex.exe
+          generate_release_notes: true

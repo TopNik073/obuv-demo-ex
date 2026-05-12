@@ -1,14 +1,14 @@
 import socket
 import threading
 import time
+
 from pathlib import Path
 
 import uvicorn
 import webview
 
-from main_app import app
-
 from core.config import config as app_config
+from main_app import app
 
 APP_HOST = app_config.APP_HOST
 APP_PORT = app_config.APP_PORT

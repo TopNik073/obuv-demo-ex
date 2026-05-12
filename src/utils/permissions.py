@@ -1,4 +1,5 @@
-from repository.user.models.roles import ProductAction, UserRole
+from repository.user.models.roles import ProductAction
+from repository.user.models.roles import UserRole
 
 _STORED_ROLES_PRODUCT: dict[UserRole, frozenset[ProductAction]] = {
     UserRole.client: frozenset({ProductAction.read}),

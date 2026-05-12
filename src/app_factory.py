@@ -1,10 +1,12 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
+from datetime import UTC
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -56,8 +58,8 @@ class AppFactory:
     async def lifespan(self, app: FastAPI):
         # Startup
         logger.info('Initializing application dependencies')
-        await seed_admin()
         app.state.start_time = datetime.now(UTC)
+        await seed_admin()
 
         docs_route = f'http://{config.APP_HOST}:{config.APP_PORT}/docs'
         logger.info(

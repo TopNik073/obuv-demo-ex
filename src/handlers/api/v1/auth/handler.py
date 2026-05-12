@@ -1,12 +1,18 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 
 from handlers.dependencies.get_current_user import get_current_user
 from repository.user.models.pydantic import UserModel
-from services.security.models import LoginRequest, RefreshRequest, TokenPairResponse
+from services.security.models import LoginRequest
+from services.security.models import RefreshRequest
+from services.security.models import TokenPairResponse
 from services.security.service import SecurityService
-from services.user.models import RegisterRequest, UserProfileResponse
+from services.user.models import RegisterRequest
+from services.user.models import UserProfileResponse
 
 auth_router = APIRouter(prefix='/auth', tags=['auth'])
 

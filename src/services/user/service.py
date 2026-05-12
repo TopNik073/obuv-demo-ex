@@ -1,23 +1,30 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 
-from services.order.service import OrderService
+from repository.order import OrderRepository
+from repository.order.models import OrderStatus
+from repository.product.repository import ProductRepository
 from repository.user.models.pydantic import UserModel
 from repository.user.repository import UserRepository
 from services.security.service import SecurityService
-from services.user.models import UserAdminCreate, UserAdminUpdate
+from services.user.models import UserAdminCreate
+from services.user.models import UserAdminUpdate
 
 
 class UserService:
     def __init__(
         self,
         user_repository: Annotated[UserRepository, Depends(UserRepository)],
-        order_service: Annotated[OrderService, Depends(OrderService)],
+        orders_repository: Annotated[OrderRepository, Depends(OrderRepository)],
+        products_repository: Annotated[ProductRepository, Depends(ProductRepository)],
     ) -> None:
         self._users = user_repository
-        self._orders = order_service
+        self._orders_repository = orders_repository
+        self._products_repository = products_repository
 
     async def get_by_id(self, user_id: UUID) -> UserModel | None:
         return await self._users.get_by_id(user_id)
@@ -79,6 +86,18 @@ class UserService:
         merged = existing.model_copy(update=patch)
         return await self._users.update(merged)
 
+    async def delete_all_orders_for_customer(self, customer_id: UUID) -> None:
+        orders = await self._orders_repository.get_all_by_customer_id(customer_id)
+        for o in orders:
+            if o.status != OrderStatus.cancelled:
+                for it in o.items:
+                    if not await self._products_repository.adjust_quantity(it.product_id, it.quantity):
+                        raise HTTPException(
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f'Could not restore stock for product {it.product_id}',
+                        )
+        await self._orders_repository.delete_orders_by_customer_id(customer_id)
+
     async def delete_user(
         self,
         actor_id: UUID,
@@ -92,7 +111,7 @@ class UserService:
         target = await self._users.get_by_id(target_id)
         if target is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Пользователь не найден')
-        await self._orders.delete_all_orders_for_customer(target_id)
+        await self.delete_all_orders_for_customer(target_id)
         deleted = await self._users.delete(target_id)
         if not deleted:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Пользователь не найден')

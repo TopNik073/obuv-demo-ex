@@ -1,8 +1,8 @@
+from core.config import config
 from repository.user.models.postgres import UserORM
 from repository.user.models.roles import UserRole
 from repository.user.repository import UserRepository
 from services.security.service import SecurityService
-from core.config import config
 from utils.db_connection import session_factory
 
 

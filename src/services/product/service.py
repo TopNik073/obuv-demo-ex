@@ -1,17 +1,23 @@
 import csv
-from decimal import Decimal, InvalidOperation
+
+from decimal import Decimal
+from decimal import InvalidOperation
 from io import StringIO
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 
 from repository.order.repository import OrderRepository
 from repository.product.models.pydantic import ProductModel
 from repository.product.repository import ProductRepository
 from repository.user.models.pydantic import UserModel
 from repository.user.models.roles import UserRole
-from services.product.models import DISCOUNT_PERCENT_MAX, ProductCreate, ProductUpdate
+from services.product.models import DISCOUNT_PERCENT_MAX
+from services.product.models import ProductCreate
+from services.product.models import ProductUpdate
 
 
 class ProductService:
@@ -20,8 +26,8 @@ class ProductService:
         product_repository: Annotated[ProductRepository, Depends(ProductRepository)],
         order_repository: Annotated[OrderRepository, Depends(OrderRepository)],
     ) -> None:
-        self._products = product_repository
-        self._orders = order_repository
+        self._products_repository = product_repository
+        self._orders_repository = order_repository
 
     def _ensure_filters_allowed(self, user: UserModel | None) -> bool:
         return user is not None and user.role in (UserRole.manager, UserRole.admin)
@@ -53,7 +59,7 @@ class ProductService:
         if wants_filters and not self._ensure_filters_allowed(user):
             wants_filters = False
 
-        return await self._products.get_many(
+        return await self._products_repository.get_many(
             page=page,
             page_size=page_size,
             search=search if wants_filters else None,
@@ -62,7 +68,7 @@ class ProductService:
         )
 
     async def get_product(self, product_id: UUID) -> ProductModel:
-        entity = await self._products.get_by_id(product_id)
+        entity = await self._products_repository.get_by_id(product_id)
         if entity is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Product not found')
         return entity
@@ -82,27 +88,27 @@ class ProductService:
             base_price=data.base_price,
         )
         self._validate_product_row(model)
-        return await self._products.create(model)
+        return await self._products_repository.create(model)
 
     async def update_product(
         self,
         product_id: UUID,
         data: ProductUpdate,
     ) -> ProductModel:
-        existing = await self._products.get_by_id(product_id)
+        existing = await self._products_repository.get_by_id(product_id)
         if existing is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Product not found')
         patch = data.model_dump(exclude_unset=True)
         merged = existing.model_copy(update=patch)
         self._validate_product_row(merged)
-        return await self._products.update(merged)
+        return await self._products_repository.update(merged)
 
     async def delete_product(self, product_id: UUID) -> None:
-        existing = await self._products.get_by_id(product_id)
+        existing = await self._products_repository.get_by_id(product_id)
         if existing is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Product not found')
-        await self._orders.remove_line_items_for_product(product_id)
-        deleted = await self._products.delete(product_id)
+        await self._orders_repository.remove_line_items_for_product(product_id)
+        deleted = await self._products_repository.delete(product_id)
         if not deleted:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Product not found')
 
@@ -187,6 +193,6 @@ class ProductService:
                 base_price=pc.base_price,
             )
             self._validate_product_row(model)
-            await self._products.create(model)
+            await self._products_repository.create(model)
             created += 1
         return created

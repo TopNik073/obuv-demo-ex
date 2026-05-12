@@ -1,17 +1,24 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC
+from datetime import datetime
+from datetime import timedelta
 from typing import Annotated
 from uuid import UUID
+
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-
-from fastapi import Depends, HTTPException, status
-from jose import JWTError, jwt
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+from jose import JWTError
+from jose import jwt
 
 from core.config import config
 from repository.user.models.pydantic import UserModel
 from repository.user.models.roles import UserRole
 from repository.user.repository import UserRepository
-from services.security.models import LoginRequest, RefreshRequest, TokenPairResponse
+from services.security.models import LoginRequest
+from services.security.models import RefreshRequest
+from services.security.models import TokenPairResponse
 from services.user.models import RegisterRequest
 
 JWT_TYP_ACCESS = 'access'
@@ -22,7 +29,7 @@ class SecurityService:
     _password_hasher = PasswordHasher()
 
     def __init__(self, user_repository: Annotated[UserRepository, Depends(UserRepository)]) -> None:
-        self._users = user_repository
+        self._users_repository = user_repository
 
     @classmethod
     def hash_password(cls, plain: str) -> str:
@@ -106,7 +113,7 @@ class SecurityService:
         )
 
     async def login(self, body: LoginRequest) -> TokenPairResponse:
-        user = await self._users.get_by_username(body.username)
+        user = await self._users_repository.get_by_username(body.username)
         if user is None or not self.verify_password(body.password, user.password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -120,7 +127,7 @@ class SecurityService:
         return self.issue_token_pair(user.id)
 
     async def register(self, body: RegisterRequest) -> TokenPairResponse:
-        existing = await self._users.get_by_username(body.username)
+        existing = await self._users_repository.get_by_username(body.username)
         if existing is not None:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -134,7 +141,7 @@ class SecurityService:
             lastname=body.lastname,
             role=UserRole.client,
         )
-        created = await self._users.create(user)
+        created = await self._users_repository.create(user)
         if created.id is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -149,7 +156,7 @@ class SecurityService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Invalid or expired refresh token',
             )
-        user: UserModel | None = await self._users.get_by_id(user_id)
+        user: UserModel | None = await self._users_repository.get_by_id(user_id)
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

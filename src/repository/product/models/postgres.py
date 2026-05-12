@@ -1,9 +1,14 @@
 from decimal import Decimal
 
-from sqlalchemy import Integer, Numeric, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Integer
+from sqlalchemy import Numeric
+from sqlalchemy import String
+from sqlalchemy import Text
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
 
-from repository.base.models.postgres import BaseORM, TimestampMixin
+from repository.base.models.postgres import BaseORM
+from repository.base.models.postgres import TimestampMixin
 
 
 class ProductORM(BaseORM, TimestampMixin):

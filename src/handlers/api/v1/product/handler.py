@@ -1,13 +1,23 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import File
+from fastapi import HTTPException
+from fastapi import Query
+from fastapi import Response
+from fastapi import UploadFile
+from fastapi import status
 
 from handlers.dependencies.get_optional_user import get_optional_user
 from handlers.dependencies.require_roles import require_roles
 from repository.user.models.pydantic import UserModel
 from repository.user.models.roles import UserRole
-from services.product.models import ProductCreate, ProductImportResult, ProductRead, ProductUpdate
+from services.product.models import ProductCreate
+from services.product.models import ProductImportResult
+from services.product.models import ProductRead
+from services.product.models import ProductUpdate
 from services.product.service import ProductService
 
 product_router = APIRouter(prefix='/products', tags=['products'])

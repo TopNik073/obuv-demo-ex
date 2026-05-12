@@ -1,7 +1,8 @@
 from collections.abc import Callable
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends
+from fastapi import HTTPException
 from starlette import status
 
 from handlers.dependencies.get_current_user import get_current_user

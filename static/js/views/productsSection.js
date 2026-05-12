@@ -170,8 +170,6 @@ export function mountProductsSection(host, me) {
   function getProductModal() {
     if (!productModal) {
       productModal = createModal({ title: 'Товар' });
-      /* Внутри секции: при смене вкладки outlet очищается и модалка снимается с DOM —
-       * иначе «Сохранить» из старой модалки вызывал load() для уже отсоединённой таблицы. */
       section.appendChild(productModal.backdrop);
     }
     return productModal;

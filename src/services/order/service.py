@@ -3,15 +3,22 @@ from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 
-from repository.order.models.pydantic import OrderItemModel, OrderModel
+from repository.order.models.pydantic import OrderItemModel
+from repository.order.models.pydantic import OrderModel
 from repository.order.models.status import OrderStatus
 from repository.order.repository import OrderRepository
 from repository.product.repository import ProductRepository
 from repository.user.models.pydantic import UserModel
 from repository.user.repository import UserRepository
-from services.order.models import OrderCreate, OrderLineCreate, OrderRead, OrderItemRead, OrderUpdate
+from services.order.models import OrderCreate
+from services.order.models import OrderItemRead
+from services.order.models import OrderLineCreate
+from services.order.models import OrderRead
+from services.order.models import OrderUpdate
 
 
 class OrderService:
@@ -21,9 +28,9 @@ class OrderService:
         product_repository: Annotated[ProductRepository, Depends(ProductRepository)],
         user_repository: Annotated[UserRepository, Depends(UserRepository)],
     ) -> None:
-        self._orders = order_repository
-        self._products = product_repository
-        self._users = user_repository
+        self._orders_repository = order_repository
+        self._products_repository = product_repository
+        self._users_repository = user_repository
 
     @staticmethod
     def _consumes_inventory(status: OrderStatus) -> bool:
@@ -41,7 +48,7 @@ class OrderService:
         unique = set(ids)
         if not unique:
             return {}
-        users = await self._users.get_many_by_ids(unique)
+        users = await self._users_repository.get_many_by_ids(unique)
         return {uid: (OrderService._customer_label(u) if (u := users.get(uid)) else '—') for uid in unique}
 
     def _order_model_to_read(
@@ -78,7 +85,7 @@ class OrderService:
 
     async def _release_stock_for_items(self, items: list[OrderItemModel]) -> None:
         for it in items:
-            ok = await self._products.adjust_quantity(it.product_id, it.quantity)
+            ok = await self._products_repository.adjust_quantity(it.product_id, it.quantity)
             if not ok:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -87,9 +94,9 @@ class OrderService:
 
     async def _reserve_stock_for_items(self, items: list[OrderItemModel]) -> None:
         for it in items:
-            ok = await self._products.adjust_quantity(it.product_id, -it.quantity)
+            ok = await self._products_repository.adjust_quantity(it.product_id, -it.quantity)
             if not ok:
-                pr = await self._products.get_by_id(it.product_id)
+                pr = await self._products_repository.get_by_id(it.product_id)
                 label = pr.name if pr else str(it.product_id)
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -109,7 +116,7 @@ class OrderService:
         for line in lines:
             totals[line.product_id] = totals.get(line.product_id, 0) + line.quantity
         for product_id, qty in totals.items():
-            product = await self._products.get_by_id(product_id)
+            product = await self._products_repository.get_by_id(product_id)
             if product is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -128,7 +135,7 @@ class OrderService:
         items: list[OrderItemModel] = []
         total = Decimal('0')
         for line in lines:
-            product = await self._products.get_by_id(line.product_id)
+            product = await self._products_repository.get_by_id(line.product_id)
             if product is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -155,7 +162,7 @@ class OrderService:
         sort: str | None = None,
         sort_desc: bool = False,
     ) -> list[OrderRead]:
-        rows = await self._orders.get_many(
+        rows = await self._orders_repository.get_many(
             page=page,
             page_size=page_size,
             search=search,
@@ -163,20 +170,20 @@ class OrderService:
             descending=sort_desc,
         )
         all_ids = {i.product_id for r in rows for i in r.items}
-        names = await self._products.get_names_by_ids(all_ids)
+        names = await self._products_repository.get_names_by_ids(all_ids)
         cust_labels = await self._customer_labels_for_ids(r.customer_id for r in rows)
         return [self._order_model_to_read(r, names, cust_labels.get(r.customer_id, '—')) for r in rows]
 
     async def get_order(self, order_id: UUID) -> OrderRead:
-        row = await self._orders.get_by_id(order_id)
+        row = await self._orders_repository.get_by_id(order_id)
         if row is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
-        names = await self._products.get_names_by_ids(i.product_id for i in row.items)
+        names = await self._products_repository.get_names_by_ids(i.product_id for i in row.items)
         cust_labels = await self._customer_labels_for_ids([row.customer_id])
         return self._order_model_to_read(row, names, cust_labels.get(row.customer_id, '—'))
 
     async def create_order(self, data: OrderCreate) -> OrderRead:
-        customer = await self._users.get_by_id(data.customer_id)
+        customer = await self._users_repository.get_by_id(data.customer_id)
         if customer is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -191,8 +198,8 @@ class OrderService:
             total_amount=total,
             items=items,
         )
-        created = await self._orders.create(order)
-        names = await self._products.get_names_by_ids(i.product_id for i in created.items)
+        created = await self._orders_repository.create(order)
+        names = await self._products_repository.get_names_by_ids(i.product_id for i in created.items)
         return self._order_model_to_read(created, names, self._customer_label(customer))
 
     async def update_order(
@@ -200,12 +207,12 @@ class OrderService:
         order_id: UUID,
         data: OrderUpdate,
     ) -> OrderRead:
-        existing = await self._orders.get_by_id(order_id)
+        existing = await self._orders_repository.get_by_id(order_id)
         if existing is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
         customer_id = data.customer_id if data.customer_id is not None else existing.customer_id
         if data.customer_id is not None:
-            customer = await self._users.get_by_id(customer_id)
+            customer = await self._users_repository.get_by_id(customer_id)
             if customer is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -249,24 +256,24 @@ class OrderService:
             created_at=existing.created_at,
             updated_at=existing.updated_at,
         )
-        saved = await self._orders.update(updated)
-        names = await self._products.get_names_by_ids(i.product_id for i in saved.items)
+        saved = await self._orders_repository.update(updated)
+        names = await self._products_repository.get_names_by_ids(i.product_id for i in saved.items)
         cust_labels = await self._customer_labels_for_ids([saved.customer_id])
         return self._order_model_to_read(saved, names, cust_labels.get(saved.customer_id, '—'))
 
     async def delete_all_orders_for_customer(self, customer_id: UUID) -> None:
-        orders = await self._orders.get_all_by_customer_id(customer_id)
+        orders = await self._orders_repository.get_all_by_customer_id(customer_id)
         for o in orders:
             if self._consumes_inventory(o.status):
                 await self._release_stock_for_items(o.items)
-        await self._orders.delete_orders_by_customer_id(customer_id)
+        await self._orders_repository.delete_orders_by_customer_id(customer_id)
 
     async def delete_order(self, order_id: UUID) -> None:
-        existing = await self._orders.get_by_id(order_id)
+        existing = await self._orders_repository.get_by_id(order_id)
         if existing is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
         if self._consumes_inventory(existing.status):
             await self._release_stock_for_items(existing.items)
-        deleted = await self._orders.delete(order_id)
+        deleted = await self._orders_repository.delete(order_id)
         if not deleted:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')

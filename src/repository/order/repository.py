@@ -1,10 +1,18 @@
 from uuid import UUID
 
-from sqlalchemy import delete, func, String, asc, cast, desc, or_, select
+from sqlalchemy import String
+from sqlalchemy import asc
+from sqlalchemy import cast
+from sqlalchemy import delete
+from sqlalchemy import desc
+from sqlalchemy import func
+from sqlalchemy import or_
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from repository.base.postgres import BasePostgresRepository
-from repository.order.models.postgres import OrderItemORM, OrderORM
+from repository.order.models.postgres import OrderItemORM
+from repository.order.models.postgres import OrderORM
 from repository.order.models.pydantic import OrderModel
 from repository.order.translator import OrderModelTranslator
 from repository.user.models.postgres import UserORM

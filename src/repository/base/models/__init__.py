@@ -3,7 +3,6 @@ from repository.base.models.postgres import TimestampMixin
 from repository.base.models.pydantic import BaseModelIdentifiable
 from repository.base.models.pydantic import TimestampedModelMixin
 
-
 __all__ = [
     'BaseModelIdentifiable',
     'BaseORM',

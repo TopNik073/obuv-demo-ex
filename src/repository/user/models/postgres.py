@@ -1,7 +1,9 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
 
-from repository.base.models.postgres import BaseORM, TimestampMixin
+from repository.base.models.postgres import BaseORM
+from repository.base.models.postgres import TimestampMixin
 from repository.user.models.roles import UserRole
 
 

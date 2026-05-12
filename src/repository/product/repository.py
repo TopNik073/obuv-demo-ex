@@ -1,7 +1,13 @@
 from collections.abc import Collection
 from uuid import UUID
 
-from sqlalchemy import String, asc, cast, desc, or_, select, update
+from sqlalchemy import String
+from sqlalchemy import asc
+from sqlalchemy import cast
+from sqlalchemy import desc
+from sqlalchemy import or_
+from sqlalchemy import select
+from sqlalchemy import update
 
 from repository.base.postgres import BasePostgresRepository
 from repository.product.models.postgres import ProductORM

@@ -9,13 +9,13 @@ from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy import update
 
-from repository.base.postgres import BasePostgresRepository
-from repository.product.models.postgres import ProductORM
+from repository.base.session import BaseSessionRepository
+from repository.product.models.orm import ProductORM
 from repository.product.models.pydantic import ProductModel
 from repository.product.translator import ProductModelTranslator
 
 
-class ProductRepository(BasePostgresRepository[ProductORM, ProductModel]):
+class ProductRepository(BaseSessionRepository[ProductORM, ProductModel]):
     _orm_class = ProductORM
     _translator = ProductModelTranslator()
 

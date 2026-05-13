@@ -27,7 +27,7 @@ def _env_file_dir() -> Path:
     return PROJECT_PATH
 
 
-if os.getenv('POSTGRESQL_CONNECTION_STRING') is None:
+if os.getenv('DATABASE_URL') is None:
     _env_path = _env_file_dir() / '.env'
     if _env_path.is_file():
         with _env_path.open(encoding='utf-8') as env_file:
@@ -58,7 +58,7 @@ target_metadata = BaseORM.metadata
 
 async def run_migrations_online():
     connectable = create_async_engine(
-        app_config.POSTGRES_URL,
+        app_config.DATABASE_URL,
         poolclass=pool.NullPool,
         future=True,
     )
@@ -73,8 +73,7 @@ def do_run_migrations(connection):
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
-        version_table_schema=target_metadata.schema,
-        include_schemas=True,
+        include_schemas=False,
         compare_type=True,
         compare_server_default=True,
         process_revision_directives=process_revision_directives,

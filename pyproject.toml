@@ -5,8 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aiosqlite>=0.21.0",
     "alembic>=1.18.4",
-    "asyncpg>=0.30.0",
     "fastapi>=0.136.1",
     "greenlet>=3.5.0",
     "jinja2>=3.1.6",
@@ -107,6 +107,7 @@ lint.select = [
 
 [tool.ruff.lint.per-file-ignores]
 "alembic/env.py" = ["INP001", "I001", "PLR2004"]
+"alembic/versions/*.py" = ["INP001"]
 
 [tool.ruff.format]
 quote-style = "single"

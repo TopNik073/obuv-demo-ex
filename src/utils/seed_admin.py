@@ -1,5 +1,5 @@
 from core.config import config
-from repository.user.models.postgres import UserORM
+from repository.user.models.orm import UserORM
 from repository.user.models.roles import UserRole
 from repository.user.repository import UserRepository
 from services.security.service import SecurityService

@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from pydantic import AliasChoices
+from pydantic import Field
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
@@ -11,6 +13,7 @@ class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=str(config_root() / '.env'),
         env_file_encoding='utf-8',
+        extra='ignore',
     )
 
     SENSITIVE_DATA: list[str] = [
@@ -24,11 +27,11 @@ class Config(BaseSettings):
     APP_PORT: int = 8000
     DEBUG: bool = False
 
-    DB_HOST: str
-    DB_PORT: str
-    DB_USER: str
-    DB_PASS: SecretStr
-    DB_NAME: str
+    SQLITE_DATABASE_PATH: Path = Path('obuv.sqlite')
+    SQLALCHEMY_DATABASE_URI: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices('DATABASE_URL', 'SQLALCHEMY_DATABASE_URI'),
+    )
 
     SQLALCHEMY_ECHO: bool = False
 
@@ -46,8 +49,18 @@ class Config(BaseSettings):
     LOG_DATE_FORMAT: str = '%Y-%m-%dT%H:%M:%S'
 
     @property
-    def POSTGRES_URL(self) -> str:
-        return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS.get_secret_value()}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
+    def sqlite_database_file(self) -> Path:
+        p = self.SQLITE_DATABASE_PATH
+        if p.is_absolute():
+            return p
+        return config_root() / p
+
+    @property
+    def DATABASE_URL(self) -> str:
+        if self.SQLALCHEMY_DATABASE_URI:
+            return self.SQLALCHEMY_DATABASE_URI
+        path = self.sqlite_database_file.resolve()
+        return f'sqlite+aiosqlite:///{path.as_posix()}'
 
 
 config = Config()

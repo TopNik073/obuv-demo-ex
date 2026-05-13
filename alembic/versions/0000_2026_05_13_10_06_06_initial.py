@@ -1,18 +1,18 @@
 """initial
 
-Revision ID: 0000_2026_05_11_21_34_41_initial
+Revision ID: 0000_2026_05_13_10_06_06_initial
 Revises: 
-Create Date: 2026-05-11 23:34:41.983389
+Create Date: 2026-05-13 12:06:06.160116
 
 """
 from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '0000_2026_05_11_21_34_41_initial'
+revision: str = '0000_2026_05_13_10_06_06_initial'
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -33,7 +33,7 @@ def upgrade() -> None:
     sa.Column('unit', sa.String(), nullable=True),
     sa.Column('discount_percent', sa.Integer(), nullable=False),
     sa.Column('base_price', sa.Numeric(precision=12, scale=2), nullable=True),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -45,28 +45,28 @@ def upgrade() -> None:
     sa.Column('surname', sa.String(), nullable=False),
     sa.Column('lastname', sa.String(), nullable=False),
     sa.Column('role', sa.String(), nullable=False),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
     op.create_table('orders',
-    sa.Column('customer_id', sa.UUID(), nullable=False),
+    sa.Column('customer_id', sa.Uuid(), nullable=False),
     sa.Column('status', sa.String(length=32), nullable=False),
     sa.Column('total_amount', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['customer_id'], ['users.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('order_items',
-    sa.Column('order_id', sa.UUID(), nullable=False),
-    sa.Column('product_id', sa.UUID(), nullable=False),
+    sa.Column('order_id', sa.Uuid(), nullable=False),
+    sa.Column('product_id', sa.Uuid(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('unit_price', sa.Numeric(precision=12, scale=2), nullable=False),
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('id', sa.Uuid(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')

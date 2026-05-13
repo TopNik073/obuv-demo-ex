@@ -29,7 +29,7 @@ hiddenimports = (
         'uvicorn.protocols.websockets.auto',
         'uvicorn.lifespan',
         'uvicorn.lifespan.on',
-        'asyncpg',
+        'aiosqlite',
         'greenlet',
     ]
     + collect_submodules('repository')

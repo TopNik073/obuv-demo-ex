@@ -10,15 +10,15 @@ from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from repository.base.postgres import BasePostgresRepository
-from repository.order.models.postgres import OrderItemORM
-from repository.order.models.postgres import OrderORM
+from repository.base.session import BaseSessionRepository
+from repository.order.models.orm import OrderItemORM
+from repository.order.models.orm import OrderORM
 from repository.order.models.pydantic import OrderModel
 from repository.order.translator import OrderModelTranslator
-from repository.user.models.postgres import UserORM
+from repository.user.models.orm import UserORM
 
 
-class OrderRepository(BasePostgresRepository[OrderORM, OrderModel]):
+class OrderRepository(BaseSessionRepository[OrderORM, OrderModel]):
     _orm_class = OrderORM
     _translator = OrderModelTranslator()
 

@@ -1,5 +1,6 @@
+import uuid
+
 from decimal import Decimal
-from uuid import UUID
 
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -9,15 +10,15 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from repository.base.models.postgres import BaseORM
-from repository.base.models.postgres import TimestampMixin
+from repository.base.models.orm import BaseORM
+from repository.base.models.orm import TimestampMixin
 from repository.order.models.status import OrderStatus
 
 
 class OrderORM(BaseORM, TimestampMixin):
     __tablename__ = 'orders'
 
-    customer_id: Mapped[UUID] = mapped_column(ForeignKey('users.id', ondelete='RESTRICT'), nullable=False)
+    customer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id', ondelete='RESTRICT'), nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default=OrderStatus.pending.value)
     total_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False, default=Decimal('0'))
 
@@ -31,12 +32,12 @@ class OrderORM(BaseORM, TimestampMixin):
 class OrderItemORM(BaseORM):
     __tablename__ = 'order_items'
 
-    order_id: Mapped[UUID] = mapped_column(
+    order_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey('orders.id', ondelete='CASCADE'),
         nullable=False,
         index=True,
     )
-    product_id: Mapped[UUID] = mapped_column(
+    product_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey('products.id', ondelete='RESTRICT'),
         nullable=False,
     )

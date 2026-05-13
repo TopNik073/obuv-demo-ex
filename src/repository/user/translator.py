@@ -1,5 +1,5 @@
 from repository.base.translator import BaseModelTranslator
-from repository.user.models.postgres import UserORM
+from repository.user.models.orm import UserORM
 from repository.user.models.pydantic import UserModel
 
 

@@ -7,13 +7,13 @@ from sqlalchemy import desc
 from sqlalchemy import or_
 from sqlalchemy import select
 
-from repository.base.postgres import BasePostgresRepository
-from repository.user.models.postgres import UserORM
+from repository.base.session import BaseSessionRepository
+from repository.user.models.orm import UserORM
 from repository.user.models.pydantic import UserModel
 from repository.user.translator import UserModelTranslator
 
 
-class UserRepository(BasePostgresRepository[UserORM, UserModel]):
+class UserRepository(BaseSessionRepository[UserORM, UserModel]):
     _orm_class = UserORM
     _translator = UserModelTranslator()
 

@@ -1,5 +1,5 @@
 from repository.base import BaseModelTranslator
-from repository.product.models.postgres import ProductORM
+from repository.product.models.orm import ProductORM
 from repository.product.models.pydantic import ProductModel
 
 

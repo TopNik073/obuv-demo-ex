@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from repository.base import BaseModelTranslator
-from repository.base.models.postgres import BaseORM
+from repository.base.models.orm import BaseORM
 from repository.base.models.pydantic import BaseModelIdentifiable
 from repository.base.repository import BaseRepository
 from utils.db_connection import get_db_session
@@ -18,7 +18,7 @@ ORMType = TypeVar('ORMType', bound=BaseORM)
 ModelType = TypeVar('ModelType', bound=BaseModelIdentifiable)
 
 
-class BasePostgresRepository(BaseRepository[ORMType, ModelType]):
+class BaseSessionRepository(BaseRepository[ORMType, ModelType]):
     _orm_class: type[ORMType]
     _translator: BaseModelTranslator
 
